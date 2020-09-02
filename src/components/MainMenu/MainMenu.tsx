@@ -28,10 +28,7 @@ export class MainMenu extends React.Component<MainMenuProperties> {
         this.state = {
             items: props.items,
         };
-
-   
 }
-
     setItems(items:MainMenuItem[]) {
         this.setState({
             items:items,
