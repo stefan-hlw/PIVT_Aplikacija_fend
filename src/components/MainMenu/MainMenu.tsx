@@ -14,22 +14,43 @@ export class MainMenuItem {
 interface MainMenuProperties {
     items: MainMenuItem[];
 }
+interface MainMenuState {
+    items: MainMenuItem[];
+}
 
 export class MainMenu extends React.Component<MainMenuProperties> {
+    state: MainMenuState;
+
+    constructor(props: Readonly<MainMenuProperties>) {
+        super(props);
+        
+        this.state = {
+            items: props.items,
+        };
+
+   
+}
+
+    setItems(items:MainMenuItem[]) {
+        this.setState({
+            items:items,
+        })
+    }
     render() {
         return(
             <Container>
                  <Nav variant="tabs">
-                     { this.props.items.map(item => {
-                         return (
-                            <Nav.Link href = { item.link } >
-                                { item.text }
-                            </Nav.Link> 
-                            );
-                         }) 
-                     }
+                     {  this.state.items.map(this.makeNavLink)  }
                 </Nav>
             </Container>
+        );
+    }
+
+    private makeNavLink(item: MainMenuItem) {
+        return (
+            <Nav.Link href = { item.link }>
+                { item.text }
+            </Nav.Link>
         )
     }
 }
