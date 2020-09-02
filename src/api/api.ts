@@ -18,32 +18,11 @@ export default function api(
                 },
             };
         axios(requestData)
-        .then(res => responseHandler(res, resolve, requestData))
-        .catch(err => {
-            const response: ApiResponse = {
-                status: 'error',
-                data: err,
-            };
-            resolve(response);
-        });
-    });
-}
-
-interface ApiResponse {
-    status: 'ok' | 'error' | 'login';
-    data: any;
-}
-
-    async function responseHandler(
-        res: AxiosResponse<any>,
-        resolve: (value?: ApiResponse) => void,
-        requestData: AxiosRequestConfig,
-    ){
-        if(res.status < 200 || res.status >= 300){  // Http status codes -> server error
-
-            // handling http 401 error code, no token
-            if(res.status === 401) {
-                const newToken = await refreshToken(requestData);
+        .then(res => responseHandler(res, resolve))
+        .catch(async err => {
+              // handling http 401 error code, no token
+              if(err.res.status === 401) {
+                const newToken = await refreshToken();
                 if(!newToken) {
                     const response: ApiResponse = {
                         status: 'login',
@@ -59,6 +38,28 @@ interface ApiResponse {
                 return await repeatRequest(requestData, resolve);
                 
             }
+
+            const response: ApiResponse = {
+                status: 'error',
+                data: err,
+            };
+            resolve(response);
+        });
+    });
+}
+
+export interface ApiResponse {
+    status: 'ok' | 'error' | 'login';
+    data: any;
+}
+
+    async function responseHandler(
+        res: AxiosResponse<any>,
+        resolve: (value?: ApiResponse) => void,
+    ){
+        if(res.status < 200 || res.status >= 300){  // Http status codes -> server error
+
+          
 
             const response: ApiResponse = {
                 status: 'error',
@@ -89,7 +90,7 @@ interface ApiResponse {
         return 'Bearer ' + token;
     }
 
-    function saveToken(token: string) {
+    export function saveToken(token: string) {
         localStorage.setItem('api_token', token);
     }
 
@@ -98,14 +99,13 @@ interface ApiResponse {
         return token + '';
     }
 
-    function saveRefreshToken(token: string) {
+    export function saveRefreshToken(token: string) {
         localStorage.setItem('api_refresh_token', token);
     }
 
-    async function refreshToken(
-        requestData: AxiosRequestConfig): 
+    async function refreshToken(): 
         Promise<string | null> {
-            const path = 'user/refresh';
+            const path = 'auth/user/refresh';
             const data = {
                 token: getRefreshToken()
             }
