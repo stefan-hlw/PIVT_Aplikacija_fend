@@ -21,7 +21,7 @@ export default function api(
         .then(res => responseHandler(res, resolve))
         .catch(async err => {
               // handling http 401 error code, no token
-              if(err.res.status === 401) {
+              if(err.response.status === 401) {
                 const newToken = await refreshToken();
                 if(!newToken) {
                     const response: ApiResponse = {
@@ -64,7 +64,7 @@ export interface ApiResponse {
             const response: ApiResponse = {
                 status: 'error',
                 data: res.data,
-            }
+            };
             return resolve(response);
         } 
 
@@ -81,7 +81,7 @@ export interface ApiResponse {
                     data: res.data,
                 };
             }
-        resolve(response);
+        return resolve(response);
     }
 
 
@@ -122,11 +122,11 @@ export interface ApiResponse {
 
         const rtr: { data: { token: string | undefined } } = await axios(refreshTokenRequestData);
 
-        if(rtr.data.token) {
+        if(!rtr.data.token) {
             return null;
         }
 
-        return refreshTokenRequestData.data.token;
+        return rtr.data.token;
 
     }
 
@@ -142,13 +142,18 @@ export interface ApiResponse {
                 } else { 
                         response = {
                             status: 'ok',
-                            data: null,
+                            data: res.data,
                     };
                 }
                 return resolve(response);
             
             })
-            .catch(error => {
+            .catch(err => {
+                const response: ApiResponse = {
+                    status: 'error',
+                    data: err,
+                };
+                return resolve(response);
             });
         }
 

@@ -14,12 +14,14 @@ import Switch from 'react-bootstrap/esm/Switch';
 import ContactPage from './components/ContactPage/ContactPage';
 import UserLoginPage from './components/UserLoginPage/UserLoginPage';
 import CategoryPage from './components/CategoryPage.tsx/CategoryPage';
+import { UserRegistrationPage } from './components/UserRegistrationPage/UserRegistrationPage';
 
 
 const menuItems = [
   new MainMenuItem("home", "/"),
   new MainMenuItem("contact", "/contact"),
   new MainMenuItem("login", "/user/login"),
+  new MainMenuItem("register", "/user/register"),
 
   new MainMenuItem("Cat 1", "/category/1/"),
   new MainMenuItem("Cat 2", "/category/2/"),
@@ -33,6 +35,7 @@ ReactDOM.render(
         <Route exact path="/" component= { HomePage }></Route>
         <Route path="/contact" component= { ContactPage }></Route>
         <Route path="/user/login" component= { UserLoginPage  }></Route>
+        <Route path="/user/register" component= { UserRegistrationPage  }></Route>
         <Route path="/category/:cId" component= { CategoryPage  }></Route>
       </Switch>
     </HashRouter>
