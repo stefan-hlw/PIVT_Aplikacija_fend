@@ -36,7 +36,7 @@ class HomePage extends React.Component {
   }
 
   private getCategories() {
-    api('category/', 'get', {})
+    api('category/?filter=parentCategoryId||$isnull', 'get', {})
     .then((res: ApiResponse) => {
         this.putCategoriesInState(res.data);
     });
@@ -67,7 +67,6 @@ class HomePage extends React.Component {
             <Card.Title>
               <FontAwesomeIcon icon= {faListAlt} /> Top level categories
             </Card.Title>
-               { this.state.categories.map(this.singleCategory) }
               <Row>
                { this.state.categories.map(this.singleCategory) }
               </Row>
@@ -79,14 +78,14 @@ class HomePage extends React.Component {
 
 private singleCategory(category: CategoryType) {
   return (
-    <Col md= "3">
-      <Card>
+    <Col lg="3" md= "4" sm="6" xs="12">
+      <Card className="mb-3">
         <Card.Body>
-          <Card.Title>
+          <Card.Title as="p">
             { category.name }
           </Card.Title>
           <Link to={ `/category/${ category.categoryId }`}
-              className="btn btn-primary">
+              className="btn btn-primary btn-block btn-sm">
                 Open category
           </Link>
         </Card.Body>
