@@ -1,7 +1,7 @@
 import React from 'react';
-import { Container, Card, Col, Row } from 'react-bootstrap';
+import { Container, Card, Col, Row, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faListAlt } from '@fortawesome/free-solid-svg-icons';
+import { faListAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 import CategoryType from '../../types/CategoryType';
 import api, { ApiResponse } from '../../api/api';
 import RecipeType from '../../types/RecipeType';
@@ -35,6 +35,11 @@ interface CategoryPageState {
     subcategories?: CategoryType[];
     recipes?: RecipeType[];
     message: string;
+    filters: {
+        keywords: string;
+        order: "name asc" | "name desc";
+        //ingredients
+    };
 }
 
 export default class CategoryPage extends React.Component<CategoryPageProperties> {
@@ -45,6 +50,10 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
 
         this.state= {
             message: '',
+            filters: {
+                keywords: '',
+                order: "name asc",
+            }
          };
     }
 
@@ -84,7 +93,14 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
                         </Card.Title>
                         { this.printOptionalMessage() }
                         { this.showSubcategories() }
-                        { this.showRecipes() }
+                        <Row>
+                            <Col xs="12" md="4" lg="3">
+                                { this.printFilters() }
+                            </Col>
+                            <Col xs="12" md="8" lg="9">
+                                { this.showRecipes() }
+                            </Col>
+                        </Row>
                         <Card.Text>
                         </Card.Text>
                     </Card.Body>
@@ -130,6 +146,56 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
           </Col>
         )
       }
+    
+    private setNewFIlter(newFilter:any) {
+        this.setState(Object.assign(this.state, {
+            filter: newFilter,
+        }));
+    }
+    
+    private filterKeywordsChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setNewFIlter(Object.assign(this.state.filters, {
+            keywords: event.target.value,
+        }));
+    }
+
+    private filterOrderChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        this.setNewFIlter(Object.assign(this.state.filters, {
+            order: event.target.value,
+        }));
+    }
+
+    private applyFilters() {
+        this.getCategoryData();
+    }
+
+
+    private printFilters() {
+        return (
+            <>
+                <Form.Group>
+                    <Form.Label htmlFor="keywords">Keywords:</Form.Label>
+                    <Form.Control type="text" id="keywords" 
+                    value={ this.state.filters.keywords } 
+                    onChange= { (e) => this.filterKeywordsChanged(e as any) }
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Control as="select" id="sortOrder" 
+                                value={ this.state.filters.order }
+                                onChange= { (e) => this.filterOrderChanged(e as any)}>
+                        <option value="name asc">Sort by name - ascending</option>
+                        <option value="name desc">Sort by name - descending</option>
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Button variant="primary" block onClick={ () => this.applyFilters() }>
+                        <FontAwesomeIcon icon={ faSearch }></FontAwesomeIcon>
+                    </Button>
+                </Form.Group>
+            </>
+        )
+    }
 
     private printOptionalMessage() {
         if (this.state.message === ''){
@@ -208,11 +274,15 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
 
                 this.setSubcategories(subcategories);
             });
+
+            const orderParts = this.state.filters.order.split(' ');
+            const orderDirection = orderParts[1].toUpperCase();
+
             api('api/recipe/search/', 'post', { 
                 categoryId: Number(this.props.match.params.cId),
-                keywords: "",
+                keywords: this.state.filters.keywords,
                 ingredients: [ ],
-                
+                orderDirection: orderDirection
             })
             .then((res:ApiResponse) => {
                 if (res.status === 'error') {
