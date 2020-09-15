@@ -38,8 +38,16 @@ interface CategoryPageState {
     filters: {
         keywords: string;
         order: "name asc" | "name desc";
-        //ingredients
+        selectedIngredients: {
+            ingredientId: number;
+            amount: string;
+        }[]
     };
+    ingredients: {
+        ingredientId: number;
+        name: string;
+        amounts: string[];
+    }[];
 }
 
 export default class CategoryPage extends React.Component<CategoryPageProperties> {
@@ -53,8 +61,17 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
             filters: {
                 keywords: '',
                 order: "name asc",
-            }
+                selectedIngredients: [],
+            },
+            ingredients: [],
          };
+    }
+
+    private setIngredients(ingredients: any) {
+        const newState = Object.assign(this.state, {
+            ingredients: ingredients,
+        });
+        this.setState(newState);
     }
 
     private setMessage(message: string) {
@@ -169,6 +186,45 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
         this.getCategoryData();
     }
 
+    private ingredientFilterChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const ingredientId = Number(event.target.dataset.ingredientId);
+        const amount = event.target.value;
+
+        if(event.target.checked) {
+            this.addIngredientFilterValue(ingredientId, amount);
+        } else {
+            this.removeFeatureFilterValue(ingredientId, amount);
+        }
+    }
+
+    private addIngredientFilterValue(ingredientId: number, amount: string) {
+        const newSelectedIngredients = [ ...this.state.filters.selectedIngredients ];
+        newSelectedIngredients.push({
+            ingredientId: ingredientId,
+            amount: amount,
+        });
+
+        this.setSelectedIngredients(newSelectedIngredients);
+    }
+
+    private removeFeatureFilterValue(ingredientId: number, amount: string) {
+        const newSelectedIngredients = this.state.filters.selectedIngredients.filter(record => {
+            return !(record.ingredientId === ingredientId && record.amount === amount);
+        });
+
+        this.setSelectedIngredients(newSelectedIngredients);
+    }
+    
+    private setSelectedIngredients(newSelectedIngredients: any){
+        this.setState(Object.assign(this.state, {
+            filters: Object.assign(this.state, {
+                selectedIngredients: newSelectedIngredients,
+            })
+        }));
+
+        console.log(this.state);
+    }
+
 
     private printFilters() {
         return (
@@ -188,6 +244,8 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
                         <option value="name desc">Sort by name - descending</option>
                     </Form.Control>
                 </Form.Group>
+                { this.state.ingredients.map(this.printIngredientFilterComponent, this) }
+
                 <Form.Group>
                     <Button variant="primary" block onClick={ () => this.applyFilters() }>
                         <FontAwesomeIcon icon={ faSearch }></FontAwesomeIcon>
@@ -196,6 +254,25 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
             </>
         )
     }
+
+    private printIngredientFilterComponent(ingredient: { ingredientId: number; name: string; amounts: string[]; }) {
+        return (
+            <Form.Group>
+                <Form.Label><strong>{ ingredient.name } </strong></Form.Label>
+                { ingredient.amounts.map(amount => this.printIngredientFilterCheckBox(ingredient, amount), this)}
+            </Form.Group>
+        );
+    }
+    private printIngredientFilterCheckBox(ingredient: any, amount: string) {
+        return (
+                <Form.Check type="checkbox" label={ amount } value={ amount } 
+                            data-ingredient-id= { ingredient.ingredientId } 
+                            onChange={ (event: any) => this.ingredientFilterChanged(event as any) }/>
+        )
+    }
+
+    
+
 
     private printOptionalMessage() {
         if (this.state.message === ''){
@@ -274,15 +351,38 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
 
                 this.setSubcategories(subcategories);
             });
-
+            /*
             const orderParts = this.state.filters.order.split(' ');
             const orderDirection = orderParts[1].toUpperCase();
+            */
+            const ingredientFilters: any[] = [];
+
+            for (const item of this.state.filters.selectedIngredients){
+                let found = false;
+                let foundRef = null;
+
+                for(const ingredientFilter of ingredientFilters) {
+                    if (ingredientFilter.ingredientId === item.ingredientId) {
+                        found = true;
+                        foundRef = ingredientFilter;
+                        break;
+                    }
+                }
+                if(!found) {
+                    ingredientFilters.push({
+                        ingredientId: item.ingredientId,
+                        amount: [item.amount],
+                    });
+                } else {
+                    foundRef.amount.push(item.amount);
+                }
+            }
 
             api('api/recipe/search/', 'post', { 
                 categoryId: Number(this.props.match.params.cId),
                 keywords: this.state.filters.keywords,
-                ingredients: [ ],
-                orderDirection: orderDirection
+                ingredients: ingredientFilters,
+                orderDirection: "ASC"
             })
             .then((res:ApiResponse) => {
                 if (res.status === 'error') {
@@ -311,6 +411,18 @@ export default class CategoryPage extends React.Component<CategoryPageProperties
 
             this.setRecipes(recipes);
         });
+        this.getIngredients();
     }
+
+    getIngredients() {
+        api('api/ingredients/amount/' + this.props.match.params.cId, 'get', {})
+        .then((res:ApiResponse) => {
+            if (res.status === 'error') {
+                return this.setMessage('Refresh the page please!');
+            }
+
+            this.setIngredients(res.data.ingredients);
+    });
+}
 }
 
