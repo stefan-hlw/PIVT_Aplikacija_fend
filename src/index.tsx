@@ -15,18 +15,17 @@ import ContactPage from './components/ContactPage/ContactPage';
 import UserLoginPage from './components/UserLoginPage/UserLoginPage';
 import CategoryPage from './components/CategoryPage.tsx/CategoryPage';
 import { UserRegistrationPage } from './components/UserRegistrationPage/UserRegistrationPage';
+import RoledMainMenu from './components/RoledMainMenu/RoledMainMenu';
+import AdministratorDashboard from './components/AdministratorDashboard.tsx/AdministratorDashboard';
+import AdministratorDashboardCategory from './components/AdministratorDashboardCategory/AdministratorDashboardCategory';
+import AdministratorDashboardIngredient from './components/AdministratorDashboardIngredient/AdministratorDashboardIngredient';
 
 
 const menuItems = [
-  new MainMenuItem("home", "/"),
-  new MainMenuItem("contact", "/contact"),
-  new MainMenuItem("login", "/user/login"),
-  new MainMenuItem("register", "/user/register"),
-
-  new MainMenuItem("Cat 1", "/category/1/"),
-  new MainMenuItem("Cat 2", "/category/2/"),
+  new MainMenuItem("Browse", "/"),
+  new MainMenuItem("Register", "/user/register"),
+  new MainMenuItem("Log in", "/login"),
 ]
-
 ReactDOM.render(
   <React.StrictMode>
     <MainMenu items= { menuItems }></MainMenu>
@@ -34,9 +33,12 @@ ReactDOM.render(
       <Switch>
         <Route exact path="/" component= { HomePage }></Route>
         <Route path="/contact" component= { ContactPage }></Route>
-        <Route path="/user/login" component= { UserLoginPage  }></Route>
+        <Route path="/login" component= { UserLoginPage  }></Route>
         <Route path="/user/register" component= { UserRegistrationPage  }></Route>
         <Route path="/category/:cId" component= { CategoryPage  }></Route>
+        <Route exact path="/administrator/dashboard" component={ AdministratorDashboard } />
+        <Route path="/administrator/dashboard/category" component={ AdministratorDashboardCategory } />
+        <Route path="/administrator/dashboard/ingredient/:cId" component={ AdministratorDashboardIngredient } />
       </Switch>
     </HashRouter>
   </React.StrictMode>,

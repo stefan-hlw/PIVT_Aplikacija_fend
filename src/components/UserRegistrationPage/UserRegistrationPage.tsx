@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
+import RoledMainMenu from '../RoledMainMenu/RoledMainMenu';
 
 interface UserRegistrationPageState {
     formData: {
@@ -45,6 +46,7 @@ export class UserRegistrationPage extends React.Component {
     render() {
         return  ( 
         <Container>
+            <RoledMainMenu role="visitor"/>
              <Col md={ { span: 8, offset: 2 } }>
                 <Card>
                   <Card.Body>
@@ -55,7 +57,7 @@ export class UserRegistrationPage extends React.Component {
                                (this.state.isRegistrationComplete === false) ?  
                                  this.renderForm() : 
                                  this.renderRegistrationCompleteMessage()
-                                  } 
+                                  }
                     </Card.Body>
                 </Card>
             </Col>
@@ -98,7 +100,7 @@ export class UserRegistrationPage extends React.Component {
         return (
             <p>
                 The account has been registered. <br />
-                <Link to="/user/login">Click here</Link> to go to the login page.
+                <Link to="/login">Click here</Link> to go to the login page.
             </p>
         );
     }

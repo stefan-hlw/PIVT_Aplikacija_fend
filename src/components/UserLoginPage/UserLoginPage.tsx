@@ -4,6 +4,7 @@ import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { Container, Card, Form, Button, Col, Alert } from 'react-bootstrap';
 import api, { ApiResponse, saveToken, saveRefreshToken } from '../../api/api'
 import { Redirect } from 'react-router-dom';
+import RoledMainMenu from '../RoledMainMenu/RoledMainMenu';
 
 interface UserLoginPageState {
     username: string;
@@ -34,14 +35,6 @@ export default class UserLoginPage extends React.Component {
         this.setState(newState)
     }
 
-    private setLogginState(isLoggedIn: boolean) {
-        const newState = Object.assign( this.state, {
-            isLoggedIn: isLoggedIn,
-    });
-          this.setState(newState);
-}
-
-
     private setErrorMessage(message: string) {
         const newState = Object.assign( this.state, {
             errorMessage: message,
@@ -50,8 +43,16 @@ export default class UserLoginPage extends React.Component {
     }
 
 
+    private setLogginState(isLoggedIn: boolean) {
+        const newState = Object.assign( this.state, {
+            isLoggedIn: isLoggedIn,
+    });
+          this.setState(newState);
+}
+
+
     private doLogin() {
-        api('auth/user/login', 'post', {
+        api('auth/login', 'post', {
             username: this.state.username,
             password: this.state.password
         })
@@ -65,7 +66,7 @@ export default class UserLoginPage extends React.Component {
                     let message = '';
 
                     switch (res.data.statusCode) {
-                        case -3001: message = 'Uknown e-mail!'; break
+                        case -3001: message = 'Unknown username!'; break
                         case -3002: message = 'Bad password!'; break
                     }
 
@@ -86,18 +87,18 @@ export default class UserLoginPage extends React.Component {
     render() {
         if (this.state.isLoggedIn === true ) {
             return ( 
-                <Redirect to="/"/>
+                <Redirect to="/administrator/dashboard"/>
             );
         }
         return(
             <Container>
+                <RoledMainMenu role="visitor" />
                 <Col md={ { span: 6, offset: 3 } }>
                 <Card>
                     <Card.Body>
                         <Card.Title>
-                            <FontAwesomeIcon icon= { faSignInAlt } />
+                            <FontAwesomeIcon icon= { faSignInAlt } /> Login
                         </Card.Title>
-                       
                             <Form>
                                 <Form.Group>
                                 <Form.Label htmlFor="username">Username:</Form.Label>
@@ -111,10 +112,12 @@ export default class UserLoginPage extends React.Component {
                                               value= { this.state.password }
                                               onChange = { event => this.formInputChanged(event as any) } />
                                 </Form.Group>
+                                <Form.Group>
                                     <Button variant="primary"
-                                             onClick={ () => this.doLogin }>
+                                            onClick={ () => this.doLogin() }>
                                         Log in
                                     </Button>
+                                </Form.Group>
                             </Form>
                         <Alert variant="danger"
                                 className={ this.state.errorMessage ? '' : 'd-none' }>  
@@ -124,6 +127,6 @@ export default class UserLoginPage extends React.Component {
                 </Card>
             </Col>
             </Container>
-        )
+        );
     }
 }

@@ -5,16 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CategoryType from '../../types/CategoryType';
 import { Link } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
+import ApiCategoryDto from '../../dtos/ApiCategoryDto';
+import RoledMainMenu from '../RoledMainMenu/RoledMainMenu';
 
 interface HomePageState {
   isUserLoggedIn: boolean;
   categories: CategoryType[];
 }
 
-interface ApiCategoryDto {
-  categoryId: number;
-  name: string;
-}
 
 class HomePage extends React.Component {
   state: HomePageState;
