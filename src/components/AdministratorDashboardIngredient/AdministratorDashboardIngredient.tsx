@@ -164,6 +164,11 @@ class AdministratorDashboardIngredient extends React.Component<AdministratorDash
                                             className="btn btn-sm btn-secondary">
                                                 <FontAwesomeIcon icon= { faBackward } /> Categories
                                             </Link>
+                                            <br/>
+                                            <Link to="/administrator/dashboard/recipe/"
+                                            className="btn btn-sm btn-secondary">
+                                                <FontAwesomeIcon icon= { faBackward } /> Recipes
+                                            </Link>
                                     </th>
                                     <th className="text-center">
                                         <Button variant="primary" size="sm"

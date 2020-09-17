@@ -6,7 +6,6 @@ import CategoryType from '../../types/CategoryType';
 import { Link } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
 import ApiCategoryDto from '../../dtos/ApiCategoryDto';
-import RoledMainMenu from '../RoledMainMenu/RoledMainMenu';
 
 interface HomePageState {
   isUserLoggedIn: boolean;

@@ -132,6 +132,12 @@ export default class AdministratorDashboardCategory extends React.Component {
         });
     }
 
+    private setStateCategories(categories: CategoryType[]) {
+        this.setState(Object.assign(this.state, {
+            categories: categories,
+        }));
+    }
+
     private setLogginState(isLoggedIn: boolean) {
         const newState = Object.assign(this.state, {
             isAdministratorLoggedIn: isLoggedIn,
@@ -140,11 +146,7 @@ export default class AdministratorDashboardCategory extends React.Component {
         this.setState(newState);
     }
 
-    private setStateCategories(categories: CategoryType[]) {
-        this.setState(Object.assign(this.state, {
-            categories: categories,
-        }));
-    }
+    
 
     render() {
         if (this.state.isAdministratorLoggedIn === false) {
